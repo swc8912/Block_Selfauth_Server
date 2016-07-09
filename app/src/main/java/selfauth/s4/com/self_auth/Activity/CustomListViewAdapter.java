@@ -102,11 +102,11 @@ public class CustomListViewAdapter extends BaseAdapter {
                                 }
 
                                 Toast.makeText(act, "새로운 IoT 장비를 추가했습니다", Toast.LENGTH_SHORT).show();
+
                                 ImageView temp = img_list.get(pos);
                                 temp.setImageResource(R.drawable.checked);
 
                                 CustomListViewItem item = item_list.get(pos);
-
                                 item.setSelected(true);
                                 item.setPrimeNumber(primeGenerator.getPrimeNumber(256));
 

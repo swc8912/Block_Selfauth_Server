@@ -33,8 +33,8 @@ public class Act_regist extends AppCompatActivity {
     private final static int REQUEST_ENABLE_BT = 1;
     private BluetoothAdapter mBlueToothAdapter;
 
-    private ArrayList<CustomListViewItem> selectedItem;
-
+    private ArrayList<CustomListViewItem> selectedItems;
+    private ArrayList<String> alreadyAddr;
     //---------------- db
     private MyDatabaseOpenHelper helper;
     private SQLiteDatabase database;
@@ -55,7 +55,11 @@ public class Act_regist extends AppCompatActivity {
                     device_set.add(device.getName());
                     //adapter.add(new CustomListViewItem(0, device.getName(), true )); 수정해야함. 이미 연결했었나 여부 판단
 
-                    adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), false ));
+                    if(alreadyAddr.contains(device.getAddress()))
+                        adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), true ));
+                    else
+                        adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), false));
+
                     adapter.notifyDataSetChanged();
                 }
 
@@ -78,11 +82,13 @@ public class Act_regist extends AppCompatActivity {
         setListener();
 
         device_set = new ArrayList<String>();
-        selectedItem = new ArrayList<CustomListViewItem>();
+        selectedItems = new ArrayList<CustomListViewItem>();
 
         //-------- database
         helper = new MyDatabaseOpenHelper(Act_regist.this, MyDatabaseOpenHelper.tableName_keys, null, 1);
         database = helper.getWritableDatabase();
+        alreadyAddr=helper.getAlreadyList(database);
+
 
 
         //-------- test
@@ -134,6 +140,8 @@ public class Act_regist extends AppCompatActivity {
                 for(CustomListViewItem item : adapter.getSelectedItems()){
                     helper.insertIntoSelected(database, item.getAddr());
                 }
+
+                helper.selectAll(database, MyDatabaseOpenHelper.tableName_selected);
             }
         });
     }
@@ -141,6 +149,8 @@ public class Act_regist extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        database.close();
+        helper.close();
 
         if(isScaning){
             mBlueToothAdapter.cancelDiscovery();
