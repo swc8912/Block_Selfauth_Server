@@ -109,11 +109,11 @@ public class CustomListViewAdapter extends BaseAdapter {
                                 bluetoothConnect.connectDevice(item_list.get(pos).getAddr(), isSecure);
 
                                 Toast.makeText(act, "새로운 IoT 장비를 추가했습니다", Toast.LENGTH_SHORT).show();
+
                                 ImageView temp = img_list.get(pos);
                                 temp.setImageResource(R.drawable.checked);
 
                                 CustomListViewItem item = item_list.get(pos);
-
                                 item.setSelected(true);
                                 item.setPrimeNumber(primeGenerator.getPrimeNumber(256));
 
@@ -154,7 +154,7 @@ public class CustomListViewAdapter extends BaseAdapter {
     public ArrayList<CustomListViewItem> getSelectedItems(){
         ArrayList<CustomListViewItem> temp=new ArrayList<CustomListViewItem>();
         for( CustomListViewItem item : item_list){
-            if(item.isAlready() || item.isSelected() ){
+            if(item.isSelected() ){
                 temp.add(item);
             }
         }

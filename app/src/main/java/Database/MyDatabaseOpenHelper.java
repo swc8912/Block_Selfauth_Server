@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -34,9 +35,8 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
         String sql = "CREATE TABLE " + tableName_keys + "(value text, date text)";
         db.execSQL(sql);
 
-        sql = "CREATE TABLE " + tableName_selected + "(deviceAddr text,   date text, PRIMARY KEY (deviceAddr))";
+        sql = "CREATE TABLE " + tableName_selected + "(deviceAddr text, date text, PRIMARY KEY (deviceAddr) )";
         db.execSQL(sql);
-
     }
 
     public void removeAllTuple(SQLiteDatabase db, String tableName) {
@@ -45,10 +45,31 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
 
         db.execSQL(sql);
     }
+    public ArrayList<String> getAlreadyList(SQLiteDatabase db){
+        ArrayList<String> list = new ArrayList<String>();
+        db.beginTransaction();
+
+        String sql = "SELECT * from "+ tableName_selected +";";
+        Log.i(TAG, "sql=" + sql);
+
+        Cursor results = db.rawQuery(sql, null);
+
+        results.moveToFirst();
+        while(!results.isAfterLast()){
+            String value = results.getString(0);
+            list.add(value);
+            results.moveToNext();
+        }
+        results.close();
+
+        db.endTransaction();
+        return list;
+    }
+
     public void insertIntoSelected(SQLiteDatabase db, String deviceAddr) {
         db.beginTransaction();
         try {
-            String sql = "insert IGNORE into " + tableName_keys + " values('" + deviceAddr +"', '"+getTime() +"')";
+            String sql = "insert OR IGNORE into " + tableName_selected+ " values('" + deviceAddr +"', '"+getTime() +"')";
             Log.i(TAG,"sql="+sql);
             db.execSQL(sql);
             db.setTransactionSuccessful();
@@ -61,7 +82,7 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
     public void insertIntoKeys(SQLiteDatabase db, String KeyValue) {
         db.beginTransaction();
         try {
-            String sql = "insert into " + tableName_selected + "(value, date)" + " values('" + KeyValue + "', '"+getTime()+"')";
+            String sql = "insert into " + tableName_keys  + "(value, date)" + " values('" + KeyValue + "', '"+getTime()+"')";
             Log.i(TAG,"sql="+sql);
             db.execSQL(sql);
             db.setTransactionSuccessful();
@@ -90,7 +111,9 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
             Log.i(TAG,tableName+" date="+date);
             results.moveToNext();
         }
+
         results.close();
+        db.endTransaction();
     }
 
     public String getTime() {

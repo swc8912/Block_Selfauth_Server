@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/selfauth.iml" filepath="$PROJECT_DIR$/selfauth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/block_selfauth.iml" filepath="$PROJECT_DIR$/block_selfauth.iml" />
     </modules>
   </component>
 </project>
