@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,16 +20,17 @@ import Database.MyDatabaseOpenHelper;
 import selfauth.s4.com.self_auth.R;
 
 
-
-
 public class Act_trade extends AppCompatActivity {
+
+    private Button btn_trade;
     private TextView text_total;
     private TextView text_cur;
-    private int cnt=0;
+    private int cnt = 0;
 
     private com.github.lzyzsd.circleprogress.DonutProgress progress;
+    private int val;
     private ListView listview;
-    private CustomTradeListViewAdapter adapter ;
+    private CustomTradeListViewAdapter adapter;
 
     //---------------- db
     private MyDatabaseOpenHelper helper;
@@ -43,23 +45,40 @@ public class Act_trade extends AppCompatActivity {
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action=intent.getAction();
-            if(BluetoothDevice.ACTION_FOUND.equals(action)){
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                Log.i("test","test title="+device.getName());
-                if(deviceAddrList.contains(device.getAddress()) && !check.contains(device.getAddress())) {
+
+                if (deviceAddrList.contains(device.getAddress()) && !check.contains(device.getAddress())) {
                     cnt++;
+
                     adapter.add(new CustomTradeListViewItem(device.getName()));
-                    Log.i("test", "test title!!!!!=" + device.getName());
-                    text_cur.setText(""+cnt);
+
+                    text_cur.setText("" + cnt);
                     adapter.notifyDataSetChanged();
                     check.add(device.getAddress());
+                    val = (int) (((double) cnt / (double)deviceAddrList.size()) * 100);
+                    Log.i("test","test val="+val);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progress.setProgress(val);
+                                }
+                            });
+                        }
+                    }).start();
+
+
                 }
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,13 +92,13 @@ public class Act_trade extends AppCompatActivity {
         //--------
         helper = new MyDatabaseOpenHelper(Act_trade.this, MyDatabaseOpenHelper.tableName_keys, null, 1);
         database = helper.getWritableDatabase();
-        deviceAddrList=helper.getAlreadyList(database);
+        deviceAddrList = helper.getAlreadyList(database);
         check = new ArrayList<String>();
 
 
-        if(deviceAddrList.size() != 0 && deviceAddrList != null){
-            Log.i("test","test size="+deviceAddrList.size());
-            text_total.setText(""+deviceAddrList.size());
+        if (deviceAddrList.size() != 0 && deviceAddrList != null) {
+            Log.i("test", "test size=" + deviceAddrList.size());
+            text_total.setText("" + deviceAddrList.size());
         }
 
         Intent bluetoothsearchintent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -91,17 +110,21 @@ public class Act_trade extends AppCompatActivity {
 
     }
 
-    public void setViews(){
+    public void setViews() {
         progress = (com.github.lzyzsd.circleprogress.DonutProgress) findViewById(R.id.act_trade_donut_progress);
-        listview = (ListView)findViewById(R.id.act_trade_listview);
-        adapter=new CustomTradeListViewAdapter();
+        listview = (ListView) findViewById(R.id.act_trade_listview);
+        adapter = new CustomTradeListViewAdapter();
         listview.setAdapter(adapter);
 
 
-
-        text_cur = (TextView)findViewById(R.id.act_trade_text_cur);
-        text_total = (TextView)findViewById(R.id.act_trade_text_total);
+        text_cur = (TextView) findViewById(R.id.act_trade_text_cur);
+        text_total = (TextView) findViewById(R.id.act_trade_text_total);
     }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mBlueToothAdapter.cancelDiscovery();
+    }
 }

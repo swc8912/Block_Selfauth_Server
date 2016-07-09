@@ -74,5 +74,6 @@ public class CustomTradeListViewAdapter extends BaseAdapter {
 
     public void add(CustomTradeListViewItem item) {
         item_list.add(item);
+        Log.i("test","test title33 add = "+item.getText());
     }
 }

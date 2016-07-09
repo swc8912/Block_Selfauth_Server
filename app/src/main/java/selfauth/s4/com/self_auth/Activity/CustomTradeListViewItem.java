@@ -7,8 +7,8 @@ import android.util.Log;
  * Created by user on 2016-07-09.
  */
 public class CustomTradeListViewItem {
-    private String addr;
 
+    private String addr;
     private String text;
 
 
