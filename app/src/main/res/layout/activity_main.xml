@@ -22,4 +22,12 @@
         android:text="거래하기"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="test버튼_ db초기화" />
+
+    <Button
+        android:id="@+id/act_main_btn4"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="결제" />
 </LinearLayout>

@@ -85,6 +85,8 @@ public class BluetoothConnect {
             if (mChatService == null)
                 //setupChat();
                 mChatService = new BluetoothChatService(this, mHandler);
+                // Initialize the buffer for outgoing messages
+                mOutStringBuffer = new StringBuffer("");
         }
     }
 
@@ -147,8 +149,7 @@ public class BluetoothConnect {
         // Initialize the BluetoothChatService to perform bluetooth connections
         mChatService = new BluetoothChatService(this, mHandler);
 
-        // Initialize the buffer for outgoing messages
-        mOutStringBuffer = new StringBuffer("");*/
+        */
     }
 
     public void serviceStop() {

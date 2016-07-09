@@ -70,8 +70,10 @@ public class CustomListViewAdapter extends BaseAdapter {
             img_list.add((ImageView) convertView.findViewById(R.id.custom_listview_regist_img_state));
             ImageView img_ready = (ImageView) convertView.findViewById(R.id.custom_listview_regist_img_state);
 
-            if(item_list.get(pos).isAlready()==true)
+            if(item_list.get(pos).isAlready()){
                 img_ready.setImageResource(R.drawable.already);
+                item_list.get(pos).setSelected(true);
+            }
 
             text.setText(item_list.get(position).getText());
 
@@ -79,7 +81,7 @@ public class CustomListViewAdapter extends BaseAdapter {
 
                 @Override
                 public void onClick(View v) {
-                    if (item_list.get(pos).isAlready() == false && item_list.get(pos).isSelected() == false ) {
+                    if (item_list.get(pos).isAlready() == false && item_list.get(pos).isSelected() == false) {
                         // 터치 시 해당 아이템 이름 출력
                         LayoutInflater inflater = act.getLayoutInflater();
                         final View dialogView = inflater.inflate(R.layout.custom_dialog, null);
@@ -103,10 +105,6 @@ public class CustomListViewAdapter extends BaseAdapter {
                                 else {
                                     type = "empty";
                                 }
-
-                                // 페이링 및 연결
-                                boolean isSecure = true;
-                                bluetoothConnect.connectDevice(item_list.get(pos).getAddr(), isSecure);
 
                                 Toast.makeText(act, "새로운 IoT 장비를 추가했습니다", Toast.LENGTH_SHORT).show();
 
