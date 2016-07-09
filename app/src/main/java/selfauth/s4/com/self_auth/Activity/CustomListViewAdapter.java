@@ -70,8 +70,10 @@ public class CustomListViewAdapter extends BaseAdapter {
             img_list.add((ImageView) convertView.findViewById(R.id.custom_listview_regist_img_state));
             ImageView img_ready = (ImageView) convertView.findViewById(R.id.custom_listview_regist_img_state);
 
-            if(item_list.get(pos).isAlready()==true)
+            if(item_list.get(pos).isAlready()){
                 img_ready.setImageResource(R.drawable.already);
+                item_list.get(pos).setSelected(true);
+            }
 
             text.setText(item_list.get(position).getText());
 

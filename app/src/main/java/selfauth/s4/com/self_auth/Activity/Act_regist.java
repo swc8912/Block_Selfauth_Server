@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 
 import Bluetooth.BluetoothChatService;
@@ -200,12 +202,15 @@ public class Act_regist extends AppCompatActivity {
                             Log.d(TAG, "connected!!!!!");
                             String sample="{\"auth_info\":[{\"date\":\"2016-07-09 20:59\",\"primeNum\":\"9\",\"key\":\"Key1\"}], \"cmd\":6}";
                             Packet pa = new Packet();
-                            pa.setCmd(BluetoothConnect.MESSAGE_DATA_LOAD_ACK);
+                            pa.setCmd(BluetoothConnect.MESSAGE_DATA_SAVE);
+                            pa.getAuthinfo().add(new Keyval("key1", "1234567789"));
                             /*for(int i=0; i<p.getAuthinfo().size(); i++){
                                 String val = pref.getString(p.getAuthinfo().get(i).getKey(), "");
                                 pa.getAuthinfo().add(new Keyval(p.getAuthinfo().get(i).getKey(), val));
                             }*/
-                            bluetoothConnect.sendMsg(sample);
+                            //bluetoothConnect.sendMsg(sample);
+                            Gson gson = new Gson();
+                            bluetoothConnect.sendMsg(gson.toJson(pa, Packet.class));
                             break;
                         case BluetoothChatService.STATE_CONNECTING:
                             //setStatus(R.string.title_connecting);

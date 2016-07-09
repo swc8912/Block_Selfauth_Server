@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         btn_pay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String sample="{\"auth_info\":[{\"date\":\"2016-07-09 23:29\",\"primeNum\":\"\",\"key\":\"Key1\"}], \"cmd\":7}";
+                String sample="{\"auth_info\":[{\"date\":\"2016-07-09 23:29\",\"primeNum\":\"\",\"key\":\"key1\"}], \"cmd\":7}";
                 Packet pa = new Packet();
                 pa.setCmd(BluetoothConnect.MESSAGE_DATA_LOAD);
                             /*for(int i=0; i<p.getAuthinfo().size(); i++){
