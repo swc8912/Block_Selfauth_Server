@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_gravity="center"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:id="@+id/custom_listview_regist_img"
+        android:src="@drawable/iot"
+        android:layout_width="30dp"
+        android:layout_height="30dp" />
+
+    <TextView
+        android:layout_weight="1"
+        android:id="@+id/custom_listview_regist_text"
+        android:text="텍스트테스트입니다."
+        android:layout_gravity="center"
+        android:layout_marginLeft="10dp"
+        android:textSize="15sp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:id="@+id/custom_listview_regist_img_state"
+        android:src="@drawable/unchecked"
+        android:layout_width="30dp"
+        android:layout_height="30dp" />
+</LinearLayout>
