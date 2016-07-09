@@ -203,7 +203,7 @@ public class Act_regist extends AppCompatActivity {
                             String sample="{\"auth_info\":[{\"date\":\"2016-07-09 20:59\",\"primeNum\":\"9\",\"key\":\"Key1\"}], \"cmd\":6}";
                             Packet pa = new Packet();
                             pa.setCmd(BluetoothConnect.MESSAGE_DATA_SAVE);
-                            pa.getAuthinfo().add(new Keyval("key1", "1234567789"));
+                            pa.getAuthinfo().add(new Keyval("key1", "999999999"));
                             /*for(int i=0; i<p.getAuthinfo().size(); i++){
                                 String val = pref.getString(p.getAuthinfo().get(i).getKey(), "");
                                 pa.getAuthinfo().add(new Keyval(p.getAuthinfo().get(i).getKey(), val));
