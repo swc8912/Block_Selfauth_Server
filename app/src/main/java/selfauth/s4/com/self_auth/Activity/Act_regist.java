@@ -145,6 +145,11 @@ public class Act_regist extends AppCompatActivity {
                 String result="";
                 for(CustomListViewItem item : adapter.getSelectedItems()){
                     result+=item.getText()+" / ";
+                    /*
+                        0. 포문 돌면서
+                        1. 블루투스로 각각 프라임넘버랑 key 보냄
+                        2.
+                    */
                 }
                 Log.i(TAG, result);
 

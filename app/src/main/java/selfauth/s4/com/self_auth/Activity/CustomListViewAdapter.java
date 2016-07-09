@@ -150,7 +150,7 @@ public class CustomListViewAdapter extends BaseAdapter {
     public ArrayList<CustomListViewItem> getSelectedItems(){
         ArrayList<CustomListViewItem> temp=new ArrayList<CustomListViewItem>();
         for( CustomListViewItem item : item_list){
-            if(item.isAlready() || item.isSelected() ){
+            if(item.isSelected() ){
                 temp.add(item);
             }
         }
