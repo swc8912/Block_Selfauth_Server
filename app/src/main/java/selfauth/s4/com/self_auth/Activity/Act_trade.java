@@ -119,6 +119,7 @@ public class Act_trade extends AppCompatActivity {
 
         text_cur = (TextView) findViewById(R.id.act_trade_text_cur);
         text_total = (TextView) findViewById(R.id.act_trade_text_total);
+
     }
 
 
