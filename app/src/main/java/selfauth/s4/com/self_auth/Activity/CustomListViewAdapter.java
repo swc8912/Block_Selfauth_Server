@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import Bluetooth.BluetoothConnect;
 import Keygenerator.primeGenerator;
 import selfauth.s4.com.self_auth.R;
 
@@ -28,12 +29,14 @@ public class CustomListViewAdapter extends BaseAdapter {
     private ArrayList<ImageView> img_list;
     private ArrayList<CustomListViewItem> item_list;
     private Activity act;
+    private BluetoothConnect bluetoothConnect;
 
-    public CustomListViewAdapter(Activity act) {
+    public CustomListViewAdapter(Activity act, BluetoothConnect bluetoothConnect) {
         item_list = new ArrayList<CustomListViewItem>();
         img_list = new ArrayList<ImageView>();
 
         this.act = act;
+        this.bluetoothConnect = bluetoothConnect;
     }
 
     @Override
@@ -100,6 +103,10 @@ public class CustomListViewAdapter extends BaseAdapter {
                                 else {
                                     type = "empty";
                                 }
+
+                                // 페이링 및 연결
+                                boolean isSecure = true;
+                                bluetoothConnect.connectDevice(item_list.get(pos).getAddr(), isSecure);
 
                                 Toast.makeText(act, "새로운 IoT 장비를 추가했습니다", Toast.LENGTH_SHORT).show();
 

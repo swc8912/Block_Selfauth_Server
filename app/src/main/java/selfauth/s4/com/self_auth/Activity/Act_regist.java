@@ -8,15 +8,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import Bluetooth.BluetoothChatService;
+import Bluetooth.BluetoothConnect;
 import Database.MyDatabaseOpenHelper;
 import selfauth.s4.com.self_auth.R;
 
@@ -32,6 +37,7 @@ public class Act_regist extends AppCompatActivity {
 
     private final static int REQUEST_ENABLE_BT = 1;
     private BluetoothAdapter mBlueToothAdapter;
+    private static BluetoothConnect bluetoothConnect;
 
     private ArrayList<CustomListViewItem> selectedItems;
     private ArrayList<String> alreadyAddr;
@@ -77,6 +83,9 @@ public class Act_regist extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_act_regist);
 
+        bluetoothConnect = new BluetoothConnect(getApplicationContext(), mHandler);
+        bluetoothConnect.serviceStart();
+
         //------ view setting
         setViews();
         setListener();
@@ -101,7 +110,7 @@ public class Act_regist extends AppCompatActivity {
     public void setViews(){
         btn_regist=(Button)findViewById(R.id.act_regist_btn2);
         btn_scan=(Button)findViewById(R.id.act_regist_btn1);
-        adapter = new CustomListViewAdapter(this);
+        adapter = new CustomListViewAdapter(this, bluetoothConnect);
         listview=(ListView)findViewById(R.id.act_regist_listview);
 
     }
@@ -155,6 +164,85 @@ public class Act_regist extends AppCompatActivity {
         if(isScaning){
             mBlueToothAdapter.cancelDiscovery();
         }
+
+        bluetoothConnect.serviceStop();
     }
+
+    // The Handler that gets information back from the BluetoothChatService
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case BluetoothConnect.MESSAGE_STATE_CHANGE:
+                    Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                    switch (msg.arg1) {
+                        case BluetoothChatService.STATE_CONNECTED:
+                            //setStatus(getString(R.string.title_connected_to) + " " + mConnectedDeviceName);
+                            //mConversationArrayAdapter.clear();
+                            break;
+                        case BluetoothChatService.STATE_CONNECTING:
+                            //setStatus(R.string.title_connecting);
+                            break;
+                        case BluetoothChatService.STATE_LISTEN:
+                        case BluetoothChatService.STATE_NONE:
+                            //setStatus(R.string.title_not_connected);
+                            break;
+                    }
+                    break;
+                case BluetoothConnect.MESSAGE_WRITE:
+                    byte[] writeBuf = (byte[]) msg.obj;
+                    // construct a string from the buffer
+                    String writeMessage = new String(writeBuf);
+                    //mConversationArrayAdapter.add("Me:  " + writeMessage);
+                    break;
+                case BluetoothConnect.MESSAGE_READ:
+                    byte[] readBuf = (byte[]) msg.obj;
+                    // construct a string from the valid bytes in the buffer
+                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    // json 파싱
+                    /*Gson gson = JsonParser.getInstance().getJspGson();
+                    Packet p = gson.fromJson(readMessage, Packet.class);
+                    SharedPreferences pref = getSharedPreferences("selfauth", MODE_PRIVATE);
+                    if(p.getCmd() == BluetoothConnect.MESSAGE_DATA_LOAD){
+                        Packet pa = new Packet();
+                        pa.setCmd(BluetoothConnect.MESSAGE_DATA_LOAD_ACK);
+                        for(int i=0; i<p.getAuthinfo().size(); i++){
+                            String val = pref.getString(p.getAuthinfo().get(i).getKey(), "");
+                            pa.getAuthinfo().add(new Keyval(p.getAuthinfo().get(i).getKey(), val));
+                        }
+                        bluetoothConnect.sendMsg(gson.toJson(pa));
+                    }
+                    else if(p.getCmd() == BluetoothConnect.MESSAGE_DATA_SAVE){
+                        SharedPreferences.Editor editor = pref.edit();
+                        for(int i=0; i<p.getAuthinfo().size(); i++){
+                            editor.putString(p.getAuthinfo().get(i).getKey(), p.getAuthinfo().get(i).getPrimeNum());
+                        }
+                        editor.commit();
+                        Packet pa = new Packet();
+                        pa.setCmd(BluetoothConnect.MESSAGE_DATA_LOAD_ACK);
+                        bluetoothConnect.sendMsg(gson.toJson(pa));
+                    }
+                    else if(p.getCmd() == BluetoothConnect.MESSAGE_DATA_SAVE_ACK){
+                        Log.d("1", "msg data save ack");
+                    }
+                    else if(p.getCmd() == BluetoothConnect.MESSAGE_DATA_LOAD_ACK){
+                        Log.d("1", "msg data load ack");
+                    }*/
+                    //mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
+                    break;
+                case BluetoothConnect.MESSAGE_DEVICE_NAME:
+                    // save the connected device's name
+                    //mConnectedDeviceName = msg.getData().getString(BluetoothConnect.DEVICE_NAME);
+                    //Toast.makeText(getApplicationContext(), "Connected to "
+                    //        + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                    break;
+                case BluetoothConnect.MESSAGE_TOAST:
+                    Toast.makeText(getApplicationContext(), msg.getData().getString(BluetoothConnect.TOAST),
+                            Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
+
 }
 
