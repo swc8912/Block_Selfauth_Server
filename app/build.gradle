@@ -25,4 +25,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile files('libs/bouncycastle.jar')
     compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.github.lzyzsd:circleprogress:1.1.0@aar'
 }

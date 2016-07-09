@@ -63,7 +63,7 @@ public class CustomListViewAdapter extends BaseAdapter {
         if (convertView == null) {
 
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.custom_listview_regist, parent, false);
+            convertView = inflater.inflate(R.layout.custom_listview_trade, parent, false);
 
             // TextView에 현재 position의 문자열 추가
             TextView text = (TextView) convertView.findViewById(R.id.custom_listview_regist_text);

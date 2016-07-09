@@ -23,7 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
     //-------------view
     private Button btn_regist_iot;
-    private Button btn_regist_test_remove;
+    private Button btn_test_remove;
+    private Button btn_trade;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,13 +48,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void registIoT(String name, String types){
-
-    }
 
     public void setViews(){
         btn_regist_iot = (Button)findViewById(R.id.act_main_btn1);
-        btn_regist_test_remove = (Button) findViewById(R.id.act_main_btn2);
+        btn_test_remove = (Button) findViewById(R.id.act_main_btn2);
+        btn_trade = (Button) findViewById(R.id.act_main_btn3);
     }
 
     public void setListener() {
@@ -67,12 +66,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btn_regist_test_remove.setOnClickListener(new View.OnClickListener() {
+        btn_test_remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 helper.removeAllTuple(database, MyDatabaseOpenHelper.tableName_selected);
                 helper.removeAllTuple(database, MyDatabaseOpenHelper.tableName_keys);
-                Toast.makeText(getApplicationContext(),"데이터베이스 초기화",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "데이터베이스 초기화", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btn_trade.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Act_trade.class);
+                startActivity(intent);
             }
         });
     }

@@ -17,4 +17,9 @@
         android:text="test버튼_ db초기화"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/act_main_btn3"
+        android:text="거래하기"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="selfauth.s4.com.self_auth" >
 
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application
         android:allowBackup="true"
@@ -19,6 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activity.Act_regist" >
+        </activity>
+        <activity android:name=".Activity.Act_trade" >
         </activity>
     </application>
 
