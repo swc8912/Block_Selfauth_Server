@@ -298,6 +298,7 @@ public class BluetoothChatService {
                 try {
                     // This is a blocking call and will only return on a
                     // successful connection or an exception
+                    Log.d(TAG, "before accept");
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
                     Log.e(TAG, "Socket Type: " + mSocketType + "accept() failed", e);
@@ -360,6 +361,7 @@ public class BluetoothChatService {
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
             try {
+                Log.d(TAG, "connectthread craete tmp");
                 if (secure) {
                     tmp = device.createRfcommSocketToServiceRecord(
                             MY_UUID_SECURE);
@@ -384,6 +386,8 @@ public class BluetoothChatService {
             try {
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
+                if(mmSocket==null)
+                    Log.d(TAG,"mmsocket null");
                 mmSocket.connect();
             } catch (IOException e) {
                 // Close the socket

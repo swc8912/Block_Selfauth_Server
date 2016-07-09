@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 
 import Bluetooth.BluetoothChatService;
 import Bluetooth.BluetoothConnect;
+import Bluetooth.Data.Keyval;
+import Bluetooth.Data.Packet;
 import Database.MyDatabaseOpenHelper;
 import selfauth.s4.com.self_auth.R;
 
@@ -37,14 +40,13 @@ public class Act_regist extends AppCompatActivity {
 
     private final static int REQUEST_ENABLE_BT = 1;
     private BluetoothAdapter mBlueToothAdapter;
-    private static BluetoothConnect bluetoothConnect;
+    public static BluetoothConnect bluetoothConnect;
 
     private ArrayList<CustomListViewItem> selectedItems;
     private ArrayList<String> alreadyAddr;
     //---------------- db
     private MyDatabaseOpenHelper helper;
     private SQLiteDatabase database;
-
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -151,6 +153,15 @@ public class Act_regist extends AppCompatActivity {
                 }
 
                 helper.selectAll(database, MyDatabaseOpenHelper.tableName_selected);
+
+                // 페이링 및 연결
+                boolean isSecure = true;
+                for(CustomListViewItem item : adapter.getSelectedItems()) {
+                    Log.d(TAG, "item.getAddr(): " + item.getAddr());
+                    bluetoothConnect.connectDevice(item.getAddr(), isSecure);
+                }
+
+                finish();
             }
         });
     }
@@ -165,7 +176,9 @@ public class Act_regist extends AppCompatActivity {
             mBlueToothAdapter.cancelDiscovery();
         }
 
-        bluetoothConnect.serviceStop();
+        unregisterReceiver(mReceiver);
+
+        //bluetoothConnect.serviceStop();
     }
 
     // The Handler that gets information back from the BluetoothChatService
@@ -179,6 +192,15 @@ public class Act_regist extends AppCompatActivity {
                         case BluetoothChatService.STATE_CONNECTED:
                             //setStatus(getString(R.string.title_connected_to) + " " + mConnectedDeviceName);
                             //mConversationArrayAdapter.clear();
+                            Log.d(TAG, "connected!!!!!");
+                            String sample="{\"auth_info\":[{\"date\":\"2016-07-09 20:59\",\"primeNum\":\"9\",\"key\":\"Key1\"}], \"cmd\":6}";
+                            Packet pa = new Packet();
+                            pa.setCmd(BluetoothConnect.MESSAGE_DATA_LOAD_ACK);
+                            /*for(int i=0; i<p.getAuthinfo().size(); i++){
+                                String val = pref.getString(p.getAuthinfo().get(i).getKey(), "");
+                                pa.getAuthinfo().add(new Keyval(p.getAuthinfo().get(i).getKey(), val));
+                            }*/
+                            bluetoothConnect.sendMsg(sample);
                             break;
                         case BluetoothChatService.STATE_CONNECTING:
                             //setStatus(R.string.title_connecting);
@@ -199,6 +221,7 @@ public class Act_regist extends AppCompatActivity {
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
+                    Log.d(TAG,"read: " + readMessage);
                     // json 파싱
                     /*Gson gson = JsonParser.getInstance().getJspGson();
                     Packet p = gson.fromJson(readMessage, Packet.class);
