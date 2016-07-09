@@ -95,6 +95,14 @@ public class BluetoothChatService {
         mHandler.obtainMessage(BluetoothConnect.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
+    private synchronized void setState(int state, String addr) {
+        if (D) Log.d(TAG, "setState() " + mState + " -> " + state);
+        mState = state;
+
+        // Give the new state to the Handler so the UI Activity can update
+        mHandler.obtainMessage(BluetoothConnect.MESSAGE_STATE_CHANGE, state, -1, addr).sendToTarget();
+    }
+
     /**
      * Return the current connection state. */
     public synchronized int getState() {
@@ -161,9 +169,9 @@ public class BluetoothChatService {
         mConnectThreadList.add(thread);
         thread.start();
         if(mConnectedThreadList.size() == 0)
-            setState(STATE_CONNECTING);
+            setState(STATE_CONNECTING, device.getAddress());
         else
-            setState(STATE_CONNECTED);
+            setState(STATE_CONNECTED, device.getAddress());
     }
 
     /**
@@ -205,7 +213,7 @@ public class BluetoothChatService {
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 
-        setState(STATE_CONNECTED);
+        setState(STATE_CONNECTED, device.getAddress());
     }
 
     /**
