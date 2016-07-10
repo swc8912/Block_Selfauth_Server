@@ -29,6 +29,7 @@ import Bluetooth.Data.Packet;
 import Bluetooth.Data.Recvdata;
 import Database.MyDatabaseOpenHelper;
 import Keygenerator.primeGenerator;
+import Model.primeByKey;
 import Model.registForm;
 import bigjava.math.BigInteger;
 import selfauth.s4.com.self_auth.R;
@@ -269,7 +270,42 @@ public class Act_regist extends AppCompatActivity {
                         //Log.d("1", "msg data save ack");
                     }
                     else if(p.getCmd() == BluetoothConnect.MESSAGE_DATA_LOAD_ACK){
-                        Log.i(TAG,"test="+p.getAuthinfo().get(0).getPrimeNum());
+                        ArrayList<primeByKey> keyList = new ArrayList<primeByKey>();
+                        for(int i = 0 ; i < p.getAuthinfo().size() ; ++i){
+                            Keyval temp = p.getAuthinfo().get(i);
+                            String curKey = temp.getKey();
+
+                            boolean isExist = false;
+                            primeByKey tempPrimeByKey=null;
+                            for(primeByKey primebykey : keyList){
+                                if(primebykey.key.equals(curKey)){
+                                    isExist = true;
+                                    tempPrimeByKey = primebykey;
+                                    break;
+                                }
+                            }
+                            if(isExist == true){
+                                tempPrimeByKey.add(new BigInteger(temp.getPrimeNum()));
+                            }
+                            else{
+                                tempPrimeByKey = new primeByKey(curKey);
+                                tempPrimeByKey.add(new BigInteger(temp.getPrimeNum()));
+                                keyList.add(tempPrimeByKey);
+                            }
+                        }
+
+                        //// 여기서 부터
+                        // KeyList는 연습장 처럼 구성되어 있다.
+                        // 이제 keyList돌면서 JSon의 { } 안의 [ ] 로 만들어야한다.
+                        // keyList.get(i) 하면 primeByKey가 있는데 getMulti 머시기 함수로 그 키로 있는 소수 곱해주는 함수 만ㄷ르어놨다
+                        // 존나 친절한 코더지 난 ㅎㅎㅎㅎㅎ
+                        // 그니까 { } 안에 []만 포문돌면서 만들어서 key는 keyList.get(i).key로 primenumber는 (이미곱해짐) keyList.get(i).getMultityPrimeNumber로 해서
+                        for(int i = 0 ; i <keyList.size() ; ++i){
+
+                        }
+                        // 포문이 끝나면 httpRequest 요청 보내면 됨. 보낼떄 json 설정해야하는거 까먹지망 ㅎㅎ
+                        // http://wowan.tistory.com/63
+                        // 참고 사이트
                     }
 
                     // json 파싱
