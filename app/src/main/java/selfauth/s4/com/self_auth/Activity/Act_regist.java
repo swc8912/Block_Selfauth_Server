@@ -27,6 +27,7 @@ import Bluetooth.BluetoothChatService;
 import Bluetooth.BluetoothConnect;
 import Bluetooth.Data.Keyval;
 import Bluetooth.Data.Packet;
+import Bluetooth.Data.Recvdata;
 import Database.MyDatabaseOpenHelper;
 import Keygenerator.primeGenerator;
 import Model.registForm;
@@ -165,7 +166,7 @@ public class Act_regist extends AppCompatActivity {
                 String key = "asdf";
                 for(CustomListViewItem item : adapter.getSelectedItems()){
                     item.setKeyValue(key);
-                    helper.insertIntoSelected(database, item.getAddr());
+                    //helper.insertIntoSelected(database, item.getAddr());
                     if(item.isSelected()) {
                         deviceInfo.add(new registForm(item.getAddr(), item.getKeyValue(), "" + item.getPrimeNumber()));
                         Log.d(TAG, "addr: " + item.getAddr() + " " + item.getPrimeNumber());
@@ -252,10 +253,15 @@ public class Act_regist extends AppCompatActivity {
                     //mConversationArrayAdapter.add("Me:  " + writeMessage);
                     break;
                 case BluetoothConnect.MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
+                    Recvdata data = (Recvdata) msg.obj;
+                    byte[] readBuf = data.getBuffer();
+                    //byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     Log.d(TAG,"read: " + readMessage);
+                    helper = new MyDatabaseOpenHelper(Act_regist.this, MyDatabaseOpenHelper.tableName_keys, null, 1);
+                    database = helper.getWritableDatabase();
+                    helper.insertIntoSelected(database, data.getAddr());
                     // json 파싱
                     /*Gson gson = JsonParser.getInstance().getJspGson();
                     Packet p = gson.fromJson(readMessage, Packet.class);
