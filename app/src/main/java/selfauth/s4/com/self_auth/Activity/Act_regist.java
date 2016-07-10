@@ -26,9 +26,9 @@ import Bluetooth.BluetoothChatService;
 import Bluetooth.BluetoothConnect;
 import Bluetooth.Data.Keyval;
 import Bluetooth.Data.Packet;
+import Bluetooth.Data.Recvdata;
 import Database.MyDatabaseOpenHelper;
 import Keygenerator.primeGenerator;
-import Model.AuthInfo;
 import Model.registForm;
 import bigjava.math.BigInteger;
 import selfauth.s4.com.self_auth.R;
@@ -165,7 +165,7 @@ public class Act_regist extends AppCompatActivity {
                 String key = "asdf";
                 for(CustomListViewItem item : adapter.getSelectedItems()){
                     item.setKeyValue(key);
-                    helper.insertIntoSelected(database, item.getAddr());
+                    //helper.insertIntoSelected(database, item.getAddr());
                     if(item.isSelected()) {
                         deviceInfo.add(new registForm(item.getAddr(), item.getKeyValue(), "" + item.getPrimeNumber()));
                         Log.d(TAG, "addr: " + item.getAddr() + " " + item.getPrimeNumber());
@@ -252,17 +252,25 @@ public class Act_regist extends AppCompatActivity {
                     //mConversationArrayAdapter.add("Me:  " + writeMessage);
                     break;
                 case BluetoothConnect.MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
+                    Recvdata data = (Recvdata) msg.obj;
+                    byte[] readBuf = data.getBuffer();
+                    //byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     Log.d(TAG,"read: " + readMessage);
-
-                    //------------------------
+                    helper = new MyDatabaseOpenHelper(Act_regist.this, MyDatabaseOpenHelper.tableName_keys, null, 1);
+                    database = helper.getWritableDatabase();
+                    helper.insertIntoSelected(database, data.getAddr());
 
                     Gson gson = new Gson();
-                    AuthInfo info = gson.fromJson(readMessage, AuthInfo.class);
-                    Log.i(TAG,"test="+info.getKey());
-                    //------------------------
+                    Packet p = gson.fromJson(readMessage, Packet.class);
+
+                    if(p.getCmd() == BluetoothConnect.MESSAGE_DATA_SAVE_ACK){
+                        //Log.d("1", "msg data save ack");
+                    }
+                    else if(p.getCmd() == BluetoothConnect.MESSAGE_DATA_LOAD_ACK){
+                        Log.i(TAG,"test="+p.getAuthinfo().get(0).getPrimeNum());
+                    }
 
                     // json 파싱
                     /*Gson gson = JsonParser.getInstance().getJspGson();

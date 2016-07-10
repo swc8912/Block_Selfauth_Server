@@ -6,7 +6,7 @@ package Model;
 public class AuthInfo {
     private String key;			// value of key
     private String primeNum;	// multiplication of prime numbers
-    private String date;		// date of record
+
 
     public String getKey() {
         return key;
@@ -20,10 +20,5 @@ public class AuthInfo {
     public void setPrimeNum(String primeNum) {
         this.primeNum = primeNum;
     }
-    public String getDate() {
-        return date;
-    }
-    public void setDate(String date) {
-        this.date = date;
-    }
+
 }
