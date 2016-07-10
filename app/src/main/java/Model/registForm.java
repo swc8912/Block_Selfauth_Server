@@ -8,10 +8,13 @@ public class registForm {
     private String iotAddr;
     private String keyValue;
     private String primeValue;
+    private boolean isConnected;
+
     public registForm(String addr, String key, String prime){
         iotAddr = addr;
         keyValue = key;
         primeValue = prime;
+        isConnected = false;
     }
 
     public String getIotAddr(){
@@ -26,4 +29,11 @@ public class registForm {
         return primeValue;
     }
 
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    public void setIsConnected(boolean isConnected) {
+        this.isConnected = isConnected;
+    }
 }

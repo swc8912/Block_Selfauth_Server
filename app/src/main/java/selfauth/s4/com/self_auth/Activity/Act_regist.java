@@ -28,6 +28,9 @@ import Bluetooth.BluetoothConnect;
 import Bluetooth.Data.Keyval;
 import Bluetooth.Data.Packet;
 import Database.MyDatabaseOpenHelper;
+import Keygenerator.primeGenerator;
+import Model.registForm;
+import bigjava.math.BigInteger;
 import selfauth.s4.com.self_auth.R;
 
 public class Act_regist extends AppCompatActivity {
@@ -50,6 +53,8 @@ public class Act_regist extends AppCompatActivity {
     private MyDatabaseOpenHelper helper;
     private SQLiteDatabase database;
 
+    public static ArrayList<registForm> deviceInfo = new ArrayList<registForm>();
+
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -58,17 +63,18 @@ public class Act_regist extends AppCompatActivity {
 
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-
                 Log.i("TEST", "find = " + device.getName());
                 if(device_set.contains(device.getName()) == false && !TextUtils.isEmpty(device.getName())) {
                     Log.i("TEST", "new = " + device.getName());
                     device_set.add(device.getName());
                     //adapter.add(new CustomListViewItem(0, device.getName(), true )); 수정해야함. 이미 연결했었나 여부 판단
 
+                    BigInteger bigInteger = primeGenerator.getPrimeNumber(256);
+                    Log.d(TAG,"prime: " + bigInteger);
                     if(alreadyAddr.contains(device.getAddress()))
-                        adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), true ));
+                        adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), true, bigInteger));
                     else
-                        adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), false));
+                        adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), false, bigInteger));
 
                     adapter.notifyDataSetChanged();
                 }
@@ -82,6 +88,7 @@ public class Act_regist extends AppCompatActivity {
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,8 +108,6 @@ public class Act_regist extends AppCompatActivity {
         helper = new MyDatabaseOpenHelper(Act_regist.this, MyDatabaseOpenHelper.tableName_keys, null, 1);
         database = helper.getWritableDatabase();
         alreadyAddr=helper.getAlreadyList(database);
-
-
 
         //-------- test
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -155,19 +160,26 @@ public class Act_regist extends AppCompatActivity {
                 }
                 Log.i(TAG, result);
 
+                deviceInfo.clear();
                 selectedItems = adapter.getSelectedItems();
-
+                String key = "asdf";
                 for(CustomListViewItem item : adapter.getSelectedItems()){
+                    item.setKeyValue(key);
                     helper.insertIntoSelected(database, item.getAddr());
+                    if(item.isSelected()) {
+                        deviceInfo.add(new registForm(item.getAddr(), item.getKeyValue(), "" + item.getPrimeNumber()));
+                        Log.d(TAG, "addr: " + item.getAddr() + " " + item.getPrimeNumber());
+                    }
                 }
 
                 helper.selectAll(database, MyDatabaseOpenHelper.tableName_selected);
 
                 // 페이링 및 연결
                 boolean isSecure = true;
-                for(CustomListViewItem item : adapter.getSelectedItems()) {
-                    Log.d(TAG, "item.getAddr(): " + item.getAddr());
-                    bluetoothConnect.connectDevice(item.getAddr(), isSecure);
+                for(int i=0; i<deviceInfo.size(); i++) {
+                    Log.d(TAG, "item.getAddr(): " + deviceInfo.get(i).getIotAddr());
+                    if(!deviceInfo.get(i).isConnected())
+                        bluetoothConnect.connectDevice(deviceInfo.get(i).getIotAddr(), isSecure);
                 }
 
                 finish();
@@ -205,17 +217,21 @@ public class Act_regist extends AppCompatActivity {
                             //String sample="{\"auth_info\":[{\"date\":\"2016-07-09 20:59\",\"primeNum\":\"9\",\"key\":\"Key1\"}], \"cmd\":6}";
                             Packet pa = new Packet();
                             pa.setCmd(BluetoothConnect.MESSAGE_DATA_SAVE);
-                            for(CustomListViewItem item : adapter.getSelectedItems()){
-                                if(msg.obj != null && item.getAddr().equals((String)msg.obj)){
-                                    Log.d(TAG, "item.getKeyValue(): " + item.getKeyValue());
-                                    Log.d(TAG, "item.getPrimeNumber().toString(): " + item.getPrimeNumber().toString());
-                                    pa.getAuthinfo().add(new Keyval(item.getKeyValue(), item.getPrimeNumber().toString()));
+                            String addr = "";
+                            for(int i=0; i<deviceInfo.size(); i++) {
+                                if(msg.obj != null && deviceInfo.get(i).getIotAddr().equals((String) msg.obj)){
+                                    Log.d(TAG,"addr: " + deviceInfo.get(i).getIotAddr() + " " + (String) msg.obj);
+                                    Log.d(TAG, "item.getKeyValue(): " + deviceInfo.get(i).getKeyValue());
+                                    Log.d(TAG, "item.getPrimeNumber().toString(): " + deviceInfo.get(i).getPrimeValue());
+                                    pa.getAuthinfo().add(new Keyval(deviceInfo.get(i).getKeyValue(), deviceInfo.get(i).getPrimeValue()));
+                                    deviceInfo.get(i).setIsConnected(true);
+                                    addr = deviceInfo.get(i).getIotAddr();
                                     break;
                                 }
                             }
                             //bluetoothConnect.sendMsg(sample);
                             Gson gson = new Gson();
-                            bluetoothConnect.sendMsg(gson.toJson(pa, Packet.class));
+                            bluetoothConnect.sendMsg(gson.toJson(pa, Packet.class), addr);
                             break;
                         case BluetoothChatService.STATE_CONNECTING:
                             //setStatus(R.string.title_connecting);
@@ -223,6 +239,9 @@ public class Act_regist extends AppCompatActivity {
                         case BluetoothChatService.STATE_LISTEN:
                         case BluetoothChatService.STATE_NONE:
                             //setStatus(R.string.title_not_connected);
+                            for(int i=0; i<deviceInfo.size(); i++) {
+                                deviceInfo.get(i).setIsConnected(false);
+                            }
                             break;
                     }
                     break;

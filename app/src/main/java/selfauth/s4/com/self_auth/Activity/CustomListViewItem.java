@@ -20,12 +20,14 @@ public class CustomListViewItem {
     public String testName;
 
 
-    public CustomListViewItem(int imgRes, String text, String addr, boolean isAlready){
+    public CustomListViewItem(int imgRes, String text, String addr, boolean isAlready, BigInteger primeNumber){
         this.imgRes=imgRes;
         this.text=text;
         this.isAlready = isAlready;
         this.addr=addr;
         isSelected=false;
+        this.primeNumber = primeNumber;
+        this.keyValue = "";
     }
 
     public int getImgRes(){

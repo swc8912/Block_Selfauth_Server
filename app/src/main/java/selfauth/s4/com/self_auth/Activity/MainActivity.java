@@ -8,7 +8,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import Bluetooth.BluetoothConnect;
+import Bluetooth.Data.Keyval;
 import Bluetooth.Data.Packet;
 import Database.MyDatabaseOpenHelper;
 import selfauth.s4.com.self_auth.R;
@@ -96,14 +99,13 @@ public class MainActivity extends AppCompatActivity {
         btn_pay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String sample="{\"auth_info\":[{\"date\":\"2016-07-09 23:29\",\"primeNum\":\"\",\"key\":\"key1\"}], \"cmd\":7}";
-                Packet pa = new Packet();
-                pa.setCmd(BluetoothConnect.MESSAGE_DATA_LOAD);
-                            /*for(int i=0; i<p.getAuthinfo().size(); i++){
-                                String val = pref.getString(p.getAuthinfo().get(i).getKey(), "");
-                                pa.getAuthinfo().add(new Keyval(p.getAuthinfo().get(i).getKey(), val));
-                            }*/
-                Act_regist.bluetoothConnect.sendMsg(sample);
+                //String sample="{\"auth_info\":[{\"date\":\"2016-07-09 23:29\",\"primeNum\":\"\",\"key\":\"asdf\"}], \"cmd\":7}";
+                for(int i=0; i<Act_regist.deviceInfo.size(); i++) {
+                    Packet pa = new Packet();
+                    pa.setCmd(BluetoothConnect.MESSAGE_DATA_LOAD);
+                    pa.getAuthinfo().add(new Keyval(Act_regist.deviceInfo.get(i).getKeyValue(), ""));
+                    Act_regist.bluetoothConnect.sendMsg(new Gson().toJson(pa), Act_regist.deviceInfo.get(i).getIotAddr());
+                }
             }
         });
     }
@@ -111,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        Act_regist.deviceInfo.clear();
         Act_regist.bluetoothConnect.serviceStop();
     }
 }
