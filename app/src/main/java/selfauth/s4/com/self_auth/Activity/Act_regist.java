@@ -18,11 +18,20 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 
 import Bluetooth.BluetoothChatService;
 import Bluetooth.BluetoothConnect;
+import Bluetooth.Data.Keyval;
+import Bluetooth.Data.Packet;
+import Bluetooth.Data.Recvdata;
 import Database.MyDatabaseOpenHelper;
+import Keygenerator.primeGenerator;
+import Model.primeByKey;
+import Model.registForm;
+import bigjava.math.BigInteger;
 import selfauth.s4.com.self_auth.R;
 
 public class Act_regist extends AppCompatActivity {
@@ -37,7 +46,7 @@ public class Act_regist extends AppCompatActivity {
 
     private final static int REQUEST_ENABLE_BT = 1;
     private BluetoothAdapter mBlueToothAdapter;
-    private static BluetoothConnect bluetoothConnect;
+    public static BluetoothConnect bluetoothConnect;
 
     private ArrayList<CustomListViewItem> selectedItems;
     private ArrayList<String> alreadyAddr;
@@ -45,6 +54,7 @@ public class Act_regist extends AppCompatActivity {
     private MyDatabaseOpenHelper helper;
     private SQLiteDatabase database;
 
+    public static ArrayList<registForm> deviceInfo = new ArrayList<registForm>();
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -54,17 +64,18 @@ public class Act_regist extends AppCompatActivity {
 
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-
                 Log.i("TEST", "find = " + device.getName());
                 if(device_set.contains(device.getName()) == false && !TextUtils.isEmpty(device.getName())) {
                     Log.i("TEST", "new = " + device.getName());
                     device_set.add(device.getName());
                     //adapter.add(new CustomListViewItem(0, device.getName(), true )); 수정해야함. 이미 연결했었나 여부 판단
 
+                    BigInteger bigInteger = primeGenerator.getPrimeNumber(256);
+                    Log.d(TAG,"prime: " + bigInteger);
                     if(alreadyAddr.contains(device.getAddress()))
-                        adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), true ));
+                        adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), true, bigInteger));
                     else
-                        adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), false));
+                        adapter.add(new CustomListViewItem(0, device.getName(), device.getAddress(), false, bigInteger));
 
                     adapter.notifyDataSetChanged();
                 }
@@ -78,6 +89,7 @@ public class Act_regist extends AppCompatActivity {
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,8 +109,6 @@ public class Act_regist extends AppCompatActivity {
         helper = new MyDatabaseOpenHelper(Act_regist.this, MyDatabaseOpenHelper.tableName_keys, null, 1);
         database = helper.getWritableDatabase();
         alreadyAddr=helper.getAlreadyList(database);
-
-
 
         //-------- test
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -151,11 +161,29 @@ public class Act_regist extends AppCompatActivity {
                 }
                 Log.i(TAG, result);
 
+                deviceInfo.clear();
+                selectedItems = adapter.getSelectedItems();
+                String key = "asdf";
                 for(CustomListViewItem item : adapter.getSelectedItems()){
-                    helper.insertIntoSelected(database, item.getAddr());
+                    item.setKeyValue(key);
+                    //helper.insertIntoSelected(database, item.getAddr());
+                    if(item.isSelected()) {
+                        deviceInfo.add(new registForm(item.getAddr(), item.getKeyValue(), "" + item.getPrimeNumber()));
+                        Log.d(TAG, "addr: " + item.getAddr() + " " + item.getPrimeNumber());
+                    }
                 }
 
                 helper.selectAll(database, MyDatabaseOpenHelper.tableName_selected);
+
+                // 페이링 및 연결
+                boolean isSecure = true;
+                for(int i=0; i<deviceInfo.size(); i++) {
+                    Log.d(TAG, "item.getAddr(): " + deviceInfo.get(i).getIotAddr());
+                    if(!deviceInfo.get(i).isConnected())
+                        bluetoothConnect.connectDevice(deviceInfo.get(i).getIotAddr(), isSecure);
+                }
+
+                finish();
             }
         });
     }
@@ -170,7 +198,9 @@ public class Act_regist extends AppCompatActivity {
             mBlueToothAdapter.cancelDiscovery();
         }
 
-        bluetoothConnect.serviceStop();
+        unregisterReceiver(mReceiver);
+
+        //bluetoothConnect.serviceStop();
     }
 
     // The Handler that gets information back from the BluetoothChatService
@@ -184,6 +214,25 @@ public class Act_regist extends AppCompatActivity {
                         case BluetoothChatService.STATE_CONNECTED:
                             //setStatus(getString(R.string.title_connected_to) + " " + mConnectedDeviceName);
                             //mConversationArrayAdapter.clear();
+                            Log.d(TAG, "connected!!!!!");
+                            //String sample="{\"auth_info\":[{\"date\":\"2016-07-09 20:59\",\"primeNum\":\"9\",\"key\":\"Key1\"}], \"cmd\":6}";
+                            Packet pa = new Packet();
+                            pa.setCmd(BluetoothConnect.MESSAGE_DATA_SAVE);
+                            String addr = "";
+                            for(int i=0; i<deviceInfo.size(); i++) {
+                                if(msg.obj != null && deviceInfo.get(i).getIotAddr().equals((String) msg.obj)){
+                                    Log.d(TAG,"addr: " + deviceInfo.get(i).getIotAddr() + " " + (String) msg.obj);
+                                    Log.d(TAG, "item.getKeyValue(): " + deviceInfo.get(i).getKeyValue());
+                                    Log.d(TAG, "item.getPrimeNumber().toString(): " + deviceInfo.get(i).getPrimeValue());
+                                    pa.getAuthinfo().add(new Keyval(deviceInfo.get(i).getKeyValue(), deviceInfo.get(i).getPrimeValue()));
+                                    deviceInfo.get(i).setIsConnected(true);
+                                    addr = deviceInfo.get(i).getIotAddr();
+                                    break;
+                                }
+                            }
+                            //bluetoothConnect.sendMsg(sample);
+                            Gson gson = new Gson();
+                            bluetoothConnect.sendMsg(gson.toJson(pa, Packet.class), addr);
                             break;
                         case BluetoothChatService.STATE_CONNECTING:
                             //setStatus(R.string.title_connecting);
@@ -191,6 +240,9 @@ public class Act_regist extends AppCompatActivity {
                         case BluetoothChatService.STATE_LISTEN:
                         case BluetoothChatService.STATE_NONE:
                             //setStatus(R.string.title_not_connected);
+                            for(int i=0; i<deviceInfo.size(); i++) {
+                                deviceInfo.get(i).setIsConnected(false);
+                            }
                             break;
                     }
                     break;
@@ -201,9 +253,61 @@ public class Act_regist extends AppCompatActivity {
                     //mConversationArrayAdapter.add("Me:  " + writeMessage);
                     break;
                 case BluetoothConnect.MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
+                    Recvdata data = (Recvdata) msg.obj;
+                    byte[] readBuf = data.getBuffer();
+                    //byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
+                    Log.d(TAG,"read: " + readMessage);
+                    helper = new MyDatabaseOpenHelper(Act_regist.this, MyDatabaseOpenHelper.tableName_keys, null, 1);
+                    database = helper.getWritableDatabase();
+                    helper.insertIntoSelected(database, data.getAddr());
+
+                    Gson gson = new Gson();
+                    Packet p = gson.fromJson(readMessage, Packet.class);
+
+                    if(p.getCmd() == BluetoothConnect.MESSAGE_DATA_SAVE_ACK){
+                        //Log.d("1", "msg data save ack");
+                    }
+                    else if(p.getCmd() == BluetoothConnect.MESSAGE_DATA_LOAD_ACK){
+                        ArrayList<primeByKey> keyList = new ArrayList<primeByKey>();
+                        for(int i = 0 ; i < p.getAuthinfo().size() ; ++i){
+                            Keyval temp = p.getAuthinfo().get(i);
+                            String curKey = temp.getKey();
+
+                            boolean isExist = false;
+                            primeByKey tempPrimeByKey=null;
+                            for(primeByKey primebykey : keyList){
+                                if(primebykey.key.equals(curKey)){
+                                    isExist = true;
+                                    tempPrimeByKey = primebykey;
+                                    break;
+                                }
+                            }
+                            if(isExist == true){
+                                tempPrimeByKey.add(new BigInteger(temp.getPrimeNum()));
+                            }
+                            else{
+                                tempPrimeByKey = new primeByKey(curKey);
+                                tempPrimeByKey.add(new BigInteger(temp.getPrimeNum()));
+                                keyList.add(tempPrimeByKey);
+                            }
+                        }
+
+                        //// 여기서 부터
+                        // KeyList는 연습장 처럼 구성되어 있다.
+                        // 이제 keyList돌면서 JSon의 { } 안의 [ ] 로 만들어야한다.
+                        // keyList.get(i) 하면 primeByKey가 있는데 getMulti 머시기 함수로 그 키로 있는 소수 곱해주는 함수 만ㄷ르어놨다
+                        // 존나 친절한 코더지 난 ㅎㅎㅎㅎㅎ
+                        // 그니까 { } 안에 []만 포문돌면서 만들어서 key는 keyList.get(i).key로 primenumber는 (이미곱해짐) keyList.get(i).getMultityPrimeNumber로 해서
+                        for(int i = 0 ; i <keyList.size() ; ++i){
+
+                        }
+                        // 포문이 끝나면 httpRequest 요청 보내면 됨. 보낼떄 json 설정해야하는거 까먹지망 ㅎㅎ
+                        // http://wowan.tistory.com/63
+                        // 참고 사이트
+                    }
+
                     // json 파싱
                     /*Gson gson = JsonParser.getInstance().getJspGson();
                     Packet p = gson.fromJson(readMessage, Packet.class);

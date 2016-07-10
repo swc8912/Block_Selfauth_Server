@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:gravity="center"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/custom_listview_trade_img"
+        android:layout_margin="10dp"
+        android:src="@drawable/iot"
+        android:layout_width="30dp"
+        android:foregroundGravity="center"
+        android:layout_height="30dp" />
+
+    <TextView
+        android:gravity="center"
+        android:id="@+id/custom_listview_trade_text"
+        android:text="텍스트테스트입니다."
+        android:layout_gravity="center"
+        android:layout_marginLeft="10dp"
+        android:textSize="15sp"
+        android:layout_marginRight="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

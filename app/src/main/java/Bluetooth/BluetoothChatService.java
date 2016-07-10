@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import Bluetooth.Data.Recvdata;
+
 /**
  * This class does all the work for setting up and managing Bluetooth
  * connections with other devices. It has a thread that listens for
@@ -454,7 +456,10 @@ public class BluetoothChatService {
                     bytes = mmInStream.read(buffer);
 
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(BluetoothConnect.MESSAGE_READ, bytes, -1, buffer)
+                    Recvdata data = new Recvdata();
+                    data.setAddr(addr);
+                    data.setBuffer(buffer);
+                    mHandler.obtainMessage(BluetoothConnect.MESSAGE_READ, bytes, -1, data)
                             .sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
