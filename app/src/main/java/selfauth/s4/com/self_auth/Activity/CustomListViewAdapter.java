@@ -113,8 +113,7 @@ public class CustomListViewAdapter extends BaseAdapter {
 
                                 CustomListViewItem item = item_list.get(pos);
                                 item.setSelected(true);
-                                item.setPrimeNumber(primeGenerator.getPrimeNumber(256));
-
+                                //item.setKeyValue("abcd");
                             }
                         });
                         buider.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

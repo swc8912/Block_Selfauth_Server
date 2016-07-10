@@ -168,15 +168,15 @@ public class BluetoothConnect {
         }
     }
 
-    public void sendMsg(String msg){
-        sendMessage(msg);
+    public void sendMsg(String msg, String addr){
+        sendMessage(msg, addr);
     }
     /**
      * Sends a message.
      *
      * @param message A string of text to send.
      */
-    private synchronized void sendMessage(String message) {
+    private synchronized void sendMessage(String message, String addr) {
         // Check that we're actually connected before trying anything
         if (mChatService.getState() != BluetoothChatService.STATE_CONNECTED) {
             Toast.makeText(context, R.string.not_connected, Toast.LENGTH_SHORT).show();
@@ -187,7 +187,7 @@ public class BluetoothConnect {
         if (message.length() > 0) {
             // Get the message bytes and tell the BluetoothChatService to write
             byte[] send = message.getBytes();
-            mChatService.write(send);
+            mChatService.write(send, addr);
 
             // Reset out string buffer to zero and clear the edit text field
             mOutStringBuffer.setLength(0);
@@ -202,7 +202,7 @@ public class BluetoothConnect {
                     // If the action is a key-up event on the return key, send the message
                     if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
                         String message = view.getText().toString();
-                        sendMessage(message);
+                        //sendMessage(message);
                     }
                     if (D) Log.i(TAG, "END onEditorAction");
                     return true;

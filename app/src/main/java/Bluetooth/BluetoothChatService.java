@@ -95,6 +95,14 @@ public class BluetoothChatService {
         mHandler.obtainMessage(BluetoothConnect.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
+    private synchronized void setState(int state, String addr) {
+        if (D) Log.d(TAG, "setState() " + mState + " -> " + state);
+        mState = state;
+
+        // Give the new state to the Handler so the UI Activity can update
+        mHandler.obtainMessage(BluetoothConnect.MESSAGE_STATE_CHANGE, state, -1, addr).sendToTarget();
+    }
+
     /**
      * Return the current connection state. */
     public synchronized int getState() {
@@ -161,9 +169,9 @@ public class BluetoothChatService {
         mConnectThreadList.add(thread);
         thread.start();
         if(mConnectedThreadList.size() == 0)
-            setState(STATE_CONNECTING);
+            setState(STATE_CONNECTING, device.getAddress());
         else
-            setState(STATE_CONNECTED);
+            setState(STATE_CONNECTED, device.getAddress());
     }
 
     /**
@@ -194,7 +202,7 @@ public class BluetoothChatService {
         // Start the thread to manage the connection and perform transmissions
         //mConnectedThread = new ConnectedThread(socket, socketType);
         //mConnectedThread.start();
-        ConnectedThread thread = new ConnectedThread(socket, socketType);
+        ConnectedThread thread = new ConnectedThread(socket, socketType, device.getAddress());
         mConnectedThreadList.add(thread);
         thread.start();
 
@@ -205,7 +213,7 @@ public class BluetoothChatService {
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 
-        setState(STATE_CONNECTED);
+        setState(STATE_CONNECTED, device.getAddress());
     }
 
     /**
@@ -253,7 +261,7 @@ public class BluetoothChatService {
      * @param out The bytes to write
      * @see ConnectedThread#write(byte[])
      */
-    public void write(byte[] out) {
+    public void write(byte[] out, String addr) {
         // Create temporary object
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
@@ -261,10 +269,14 @@ public class BluetoothChatService {
             synchronized (this) {
                 if (mState != STATE_CONNECTED) return;
                 r = mConnectedThreadList.get(i);
+                if(r.getAddr().equals(addr)){
+                    r.write(out);
+                    break;
+                }
             }
-            // Perform the write unsynchronized
-            r.write(out);
         }
+        // Perform the write unsynchronized
+
     }
 
     /**
@@ -472,12 +484,14 @@ public class BluetoothChatService {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        private String addr;
 
-        public ConnectedThread(BluetoothSocket socket, String socketType) {
+        public ConnectedThread(BluetoothSocket socket, String socketType, String addr) {
             Log.d(TAG, "create ConnectedThread: " + socketType);
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
+            this.addr = addr;
 
             // Get the BluetoothSocket input and output streams
             try {
@@ -537,6 +551,10 @@ public class BluetoothChatService {
             } catch (IOException e) {
                 Log.e(TAG, "close() of connect socket failed", e);
             }
+        }
+
+        public String getAddr(){
+            return addr;
         }
     }
 }
