@@ -9,11 +9,11 @@
     >
 
     <ImageView
+        android:id="@+id/act_main_btn2"
         android:layout_gravity="center"
         android:src="@drawable/logo"
         android:layout_width="180dp"
         android:layout_height="180dp"
-        android:id="@+id/imageView"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="122dp" />

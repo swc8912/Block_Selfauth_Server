@@ -31,6 +31,7 @@ import Database.MyDatabaseOpenHelper;
 import Keygenerator.primeGenerator;
 import Model.primeByKey;
 import Model.registForm;
+import Parser.AuthJsonParser;
 import bigjava.math.BigInteger;
 import selfauth.s4.com.self_auth.R;
 
@@ -300,9 +301,8 @@ public class Act_regist extends AppCompatActivity {
                         // keyList.get(i) 하면 primeByKey가 있는데 getMulti 머시기 함수로 그 키로 있는 소수 곱해주는 함수 만ㄷ르어놨다
                         // 존나 친절한 코더지 난 ㅎㅎㅎㅎㅎ
                         // 그니까 { } 안에 []만 포문돌면서 만들어서 key는 keyList.get(i).key로 primenumber는 (이미곱해짐) keyList.get(i).getMultityPrimeNumber로 해서
-                        for(int i = 0 ; i <keyList.size() ; ++i){
+                        String jsonStr = AuthJsonParser.getStrFromJson(keyList);
 
-                        }
                         // 포문이 끝나면 httpRequest 요청 보내면 됨. 보낼떄 json 설정해야하는거 까먹지망 ㅎㅎ
                         // http://wowan.tistory.com/63
                         // 참고 사이트

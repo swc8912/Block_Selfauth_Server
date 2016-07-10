@@ -6,13 +6,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
-import Bluetooth.BluetoothConnect;
-import Bluetooth.Data.Keyval;
-import Bluetooth.Data.Packet;
 import Database.MyDatabaseOpenHelper;
 import selfauth.s4.com.self_auth.R;
 
@@ -28,10 +24,9 @@ public class MainActivity extends AppCompatActivity {
 
     //-------------view
     private Button btn_regist_iot;
-    private Button btn_pay;
-
-    private Button btn_test_remove;
     private Button btn_trade;
+    private Button btn_test_remove;
+    private ImageView img_test_remove;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,10 +57,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void setViews(){
         btn_regist_iot = (Button)findViewById(R.id.act_main_btn1);
-
-        btn_pay = (Button)findViewById(R.id.act_main_btn4);
-        btn_test_remove = (Button) findViewById(R.id.act_main_btn2);
         btn_trade = (Button) findViewById(R.id.act_main_btn3);
+
+        btn_test_remove = (Button) findViewById(R.id.act_main_btn2);
+        //img_test_remove = (ImageView)findViewById(R.id.act_main_btn2);
     }
 
     public void setListener() {
@@ -78,6 +73,17 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        /*
+        img_test_remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                helper.removeAllTuple(database, MyDatabaseOpenHelper.tableName_selected);
+                helper.removeAllTuple(database, MyDatabaseOpenHelper.tableName_keys);
+                Toast.makeText(getApplicationContext(), "Hello World", Toast.LENGTH_SHORT).show();
+            }
+        });
+        */
 
         btn_test_remove.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,12 +102,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btn_pay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-            }
-        });
 
     }
 
