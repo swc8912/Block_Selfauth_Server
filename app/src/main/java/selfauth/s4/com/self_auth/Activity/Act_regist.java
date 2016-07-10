@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,6 +28,7 @@ import Bluetooth.Data.Keyval;
 import Bluetooth.Data.Packet;
 import Database.MyDatabaseOpenHelper;
 import Keygenerator.primeGenerator;
+import Model.AuthInfo;
 import Model.registForm;
 import bigjava.math.BigInteger;
 import selfauth.s4.com.self_auth.R;
@@ -256,6 +256,14 @@ public class Act_regist extends AppCompatActivity {
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     Log.d(TAG,"read: " + readMessage);
+
+                    //------------------------
+
+                    Gson gson = new Gson();
+                    AuthInfo info = gson.fromJson(readMessage, AuthInfo.class);
+                    Log.i(TAG,"test="+info.getKey());
+                    //------------------------
+
                     // json 파싱
                     /*Gson gson = JsonParser.getInstance().getJspGson();
                     Packet p = gson.fromJson(readMessage, Packet.class);

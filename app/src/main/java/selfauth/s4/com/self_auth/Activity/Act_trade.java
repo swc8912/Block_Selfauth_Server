@@ -10,12 +10,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 
+import Bluetooth.BluetoothConnect;
+import Bluetooth.Data.Keyval;
+import Bluetooth.Data.Packet;
 import Database.MyDatabaseOpenHelper;
 import selfauth.s4.com.self_auth.R;
 
@@ -119,6 +125,19 @@ public class Act_trade extends AppCompatActivity {
 
         text_cur = (TextView) findViewById(R.id.act_trade_text_cur);
         text_total = (TextView) findViewById(R.id.act_trade_text_total);
+        btn_trade = (Button)findViewById(R.id.act_trade_btn);
+        btn_trade.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for(int i=0; i<Act_regist.deviceInfo.size(); i++) {
+                    Packet pa = new Packet();
+                    pa.setCmd(BluetoothConnect.MESSAGE_DATA_LOAD);
+                    pa.getAuthinfo().add(new Keyval(Act_regist.deviceInfo.get(i).getKeyValue(), ""));
+                    Act_regist.bluetoothConnect.sendMsg(new Gson().toJson(pa), Act_regist.deviceInfo.get(i).getIotAddr());
+
+                }
+            }
+        });
 
     }
 

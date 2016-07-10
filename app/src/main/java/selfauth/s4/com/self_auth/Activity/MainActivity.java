@@ -99,13 +99,7 @@ public class MainActivity extends AppCompatActivity {
         btn_pay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //String sample="{\"auth_info\":[{\"date\":\"2016-07-09 23:29\",\"primeNum\":\"\",\"key\":\"asdf\"}], \"cmd\":7}";
-                for(int i=0; i<Act_regist.deviceInfo.size(); i++) {
-                    Packet pa = new Packet();
-                    pa.setCmd(BluetoothConnect.MESSAGE_DATA_LOAD);
-                    pa.getAuthinfo().add(new Keyval(Act_regist.deviceInfo.get(i).getKeyValue(), ""));
-                    Act_regist.bluetoothConnect.sendMsg(new Gson().toJson(pa), Act_regist.deviceInfo.get(i).getIotAddr());
-                }
+
             }
         });
 
