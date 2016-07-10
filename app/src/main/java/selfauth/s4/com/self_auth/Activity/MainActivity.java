@@ -25,13 +25,13 @@ public class MainActivity extends AppCompatActivity {
     //-------------view
     private Button btn_regist_iot;
     private Button btn_trade;
-    private Button btn_test_remove;
+    //private Button btn_test_remove;
     private ImageView img_test_remove;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        //setContentView(R.layout.activity_main_copy);
+        //setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_copy);
 
         //-------- view setting
         setViews();
@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
         btn_regist_iot = (Button)findViewById(R.id.act_main_btn1);
         btn_trade = (Button) findViewById(R.id.act_main_btn3);
 
-        btn_test_remove = (Button) findViewById(R.id.act_main_btn2);
-        //img_test_remove = (ImageView)findViewById(R.id.act_main_btn2);
+        //btn_test_remove = (Button) findViewById(R.id.act_main_btn2);
+        img_test_remove = (ImageView)findViewById(R.id.act_main_btn2);
     }
 
     public void setListener() {
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*
+
         img_test_remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,8 +83,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Hello World", Toast.LENGTH_SHORT).show();
             }
         });
-        */
 
+      /*
         btn_test_remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "데이터베이스 초기화", Toast.LENGTH_SHORT).show();
             }
         });
-
+*/
         btn_trade.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

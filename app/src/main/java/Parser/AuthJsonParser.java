@@ -6,13 +6,13 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
 
-import Model.primeByKey;
+import Model.AuthInfo;
 
 /**
  * Created by user on 2016-07-09.
  */
 public class AuthJsonParser {
-    public static String getStrFromJson(List<primeByKey> authList)
+    public static String getStrFromJson(List<AuthInfo> authList)
     {
         if(authList == null)
             return null;
@@ -20,7 +20,7 @@ public class AuthJsonParser {
         Gson gson = new Gson();
         String jsonStr = gson.toJson(
                 authList,
-                new TypeToken<ArrayList<primeByKey>>() {}.getType());
+                new TypeToken<ArrayList<AuthInfo>>() {}.getType());
 
         return jsonStr;
     }
