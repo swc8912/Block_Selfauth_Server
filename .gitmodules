@@ -1,0 +1,3 @@
+[submodule "s4Server"]
+	path = s4Server
+	url = https://github.com/astrohsy/s4Server.git
